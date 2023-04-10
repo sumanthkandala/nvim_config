@@ -172,6 +172,7 @@ require('lazy').setup({
     end,
   },
 
+
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -186,7 +187,7 @@ require('lazy').setup({
   --
   --    An additional note is that if you only copied in the `init.lua`, you can just comment this line
   --    to get rid of the warning telling you that there are not plugins in `lua/custom/plugins/`.
-  { import = 'custom.plugins' },
+  -- { import = 'custom.plugins' },
 }, {})
 
 -- [[ Setting options ]]
@@ -263,6 +264,23 @@ require('telescope').setup {
     },
   },
 }
+
+-- Disable netrw to enable nvim-tree.
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- Highlight groups.
+vim.opt.termguicolors = true
+
+require("nvim-tree").setup({
+    sort_by = "case_sensitive",
+    renderer = {
+        group_empty = true,
+      },
+    filters = {
+        dotfiles = true,
+      },
+})
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
