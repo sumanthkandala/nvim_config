@@ -187,7 +187,7 @@ require('lazy').setup({
   --
   --    An additional note is that if you only copied in the `init.lua`, you can just comment this line
   --    to get rid of the warning telling you that there are not plugins in `lua/custom/plugins/`.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {})
 
 -- [[ Setting options ]]
@@ -272,7 +272,7 @@ vim.g.loaded_netrwPlugin = 1
 -- Highlight groups.
 vim.opt.termguicolors = true
 
-require("nvim-tree").setup {
+require("nvim-tree").setup({
     sort_by = "case_sensitive",
     renderer = {
         group_empty = true,
@@ -280,7 +280,7 @@ require("nvim-tree").setup {
     filters = {
         dotfiles = true,
       },
-}
+})
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
@@ -301,7 +301,7 @@ vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
-
+vim.keymap.set('n', '<leader>tt', ':NvimTreeToggle<CR>', { silent = true }, { desc = '[T]ree [T]oggle'})
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
