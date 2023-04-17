@@ -272,7 +272,7 @@ vim.g.loaded_netrwPlugin = 1
 -- Highlight groups.
 vim.opt.termguicolors = true
 
-require("nvim-tree").setup({
+require("nvim-tree").setup {
     sort_by = "case_sensitive",
     renderer = {
         group_empty = true,
@@ -280,7 +280,7 @@ require("nvim-tree").setup({
     filters = {
         dotfiles = true,
       },
-})
+}
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
