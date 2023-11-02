@@ -142,22 +142,28 @@ require('lazy').setup({
     },
   },
 
-  { -- Add indentation guides even on blank lines
-    'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help indent_blankline.txt`
-    opts = {
-      char = '┊',
-      show_trailing_blankline_indent = false,
-    },
-  },
+  -- { -- Add indentation guides even on blank lines
+  --   'lukas-reineke/indent-blankline.nvim',
+  --   -- Enable `lukas-reineke/indent-blankline.nvim`
+  --   -- See `:help indent_blankline.txt`
+  --   opts = {
+  --     char = '┊',
+  --     show_trailing_blankline_indent = false,
+  --   },
+  -- },
 
+  { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
-  { 'nvim-telescope/telescope.nvim', version = '*', dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope-live-grep-args.nvim' } },
-
+  {
+    'nvim-telescope/telescope.nvim', branch = '1.1.x',
+    dependencies = {
+        'nvim-lua/plenary.nvim',
+        'nvim-telescope/telescope-live-grep-args.nvim',
+    },
+  },
   -- "Bufferline"
   {'akinsho/bufferline.nvim', version = "*", dependencies = 'nvim-tree/nvim-web-devicons'},
 
@@ -271,6 +277,12 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- [[ Configure Bufferline ]]
 require("bufferline").setup{}
 
+-- [[ Configure theme ]]
+require('onedark').setup {
+    style = 'warmer'
+}
+require('onedark').load()
+
 -- [[ Configure Git ]]
 require('gitsigns').setup {
   signs = {
@@ -357,16 +369,14 @@ require('gitsigns').setup {
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
 local lga_actions = require("telescope-live-grep-args.actions")
-local actions = require("telescope.actions")
 require('telescope').setup {
   defaults = {
     mappings = {
       i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-        ["<C-k>"] = lga_actions.quote_prompt(),
-        ["<C-i>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
-        ["<esc>"] = actions.close,
+        ['<C-u>'] = true,
+        ['<C-d>'] = true,
+        ["<C-s>"] = lga_actions.quote_prompt(),
+        ["<C-g>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
       },
     },
   },
@@ -392,7 +402,19 @@ require("nvim-tree").setup({
   },
 })
 
-require('neoscroll').setup()
+require('neoscroll').setup({
+    -- All these keys will be mapped to their corresponding default scrolling animation
+    mappings = {'<C-u>', '<C-d>', '<C-b>', '<C-f>',
+                '<C-y>', '<C-e>', 'zt', 'zz', 'zb'},
+    hide_cursor = false,          -- Hide cursor while scrolling
+    stop_eof = true,             -- Stop at <EOF> when scrolling downwards
+    respect_scrolloff = false,   -- Stop scrolling when the cursor reaches the scrolloff margin of the file
+    cursor_scrolls_alone = true, -- The cursor will keep on scrolling even if the window cannot scroll further
+    easing_function = nil,       -- Default easing function
+    pre_hook = nil,              -- Function to run before the scrolling animation starts
+    post_hook = nil,             -- Function to run after the scrolling animation ends
+    performance_mode = true,    -- disable "performance Mode" on all buffers.
+})
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
@@ -421,13 +443,33 @@ vim.keymap.set('n', '<C-p>', ':bprev<CR>', { desc = 'Previous Buffer' })
 vim.keymap.set('n', '<C-c>', ':bdelete!<CR>', { desc = 'Close Buffer' })
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
-require('treesitter-context').setup()
+require('treesitter-context').setup{
+  enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+  max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
+  min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+  line_numbers = true,
+  multiline_threshold = 20, -- Maximum number of lines to show for a single context
+  trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+  mode = 'cursor',  -- Line used to calculate context. Choices: 'cursor', 'topline'
+  -- Separator between context and content. Should be a single character string, like '-'.
+  -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+  separator = nil,
+  zindex = 20, -- The Z-index of the context window
+  on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
+}
+
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vim' },
+  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vim', 'query' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
-  auto_install = false,
+  auto_install = true,
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  -- List of parsers to ignore installing (or "all")
+  ignore_install = {},
 
   highlight = { enable = true },
   indent = { enable = true, disable = { 'python' } },
@@ -440,50 +482,50 @@ require('nvim-treesitter.configs').setup {
       node_decremental = '<M-space>',
     },
   },
-  textobjects = {
-    select = {
-      enable = true,
-      lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-      keymaps = {
-        -- You can use the capture groups defined in textobjects.scm
-        ['aa'] = '@parameter.outer',
-        ['ia'] = '@parameter.inner',
-        ['af'] = '@function.outer',
-        ['if'] = '@function.inner',
-        ['ac'] = '@class.outer',
-        ['ic'] = '@class.inner',
-      },
-    },
-    move = {
-      enable = true,
-      set_jumps = true, -- whether to set jumps in the jumplist
-      goto_next_start = {
-        [']m'] = '@function.outer',
-        [']]'] = '@class.outer',
-      },
-      goto_next_end = {
-        [']M'] = '@function.outer',
-        [']['] = '@class.outer',
-      },
-      goto_previous_start = {
-        ['[m'] = '@function.outer',
-        ['[['] = '@class.outer',
-      },
-      goto_previous_end = {
-        ['[M'] = '@function.outer',
-        ['[]'] = '@class.outer',
-      },
-    },
-    swap = {
-      enable = true,
-      swap_next = {
-        ['<leader>a'] = '@parameter.inner',
-      },
-      swap_previous = {
-        ['<leader>A'] = '@parameter.inner',
-      },
-    },
-  },
+  --textobjects = {
+  --  select = {
+  --    enable = true,
+  --    lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+  --    keymaps = {
+  --      -- You can use the capture groups defined in textobjects.scm
+  --      ['aa'] = '@parameter.outer',
+  --      ['ia'] = '@parameter.inner',
+  --      ['af'] = '@function.outer',
+  --      ['if'] = '@function.inner',
+  --      ['ac'] = '@class.outer',
+  --      ['ic'] = '@class.inner',
+  --    },
+  --  },
+  --  move = {
+  --    enable = true,
+  --    set_jumps = true, -- whether to set jumps in the jumplist
+  --    goto_next_start = {
+  --      [']m'] = '@function.outer',
+  --      [']]'] = '@class.outer',
+  --    },
+  --    goto_next_end = {
+  --      [']M'] = '@function.outer',
+  --      [']['] = '@class.outer',
+  --    },
+  --    goto_previous_start = {
+  --      ['[m'] = '@function.outer',
+  --      ['[['] = '@class.outer',
+  --    },
+  --    goto_previous_end = {
+  --      ['[M'] = '@function.outer',
+  --      ['[]'] = '@class.outer',
+  --    },
+  --  },
+  --  swap = {
+  --    enable = true,
+  --    swap_next = {
+  --      ['<leader>a'] = '@parameter.inner',
+  --    },
+  --    swap_previous = {
+  --      ['<leader>A'] = '@parameter.inner',
+  --    },
+  --  },
+  --},
 }
 
 -- Diagnostic keymaps
@@ -543,11 +585,9 @@ end
 --  Add any additional override configuration in the following tables. They will be passed to
 --  the `settings` field of the server config. You must look up that documentation yourself.
 local servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
+  clangd = {},
+  pyright = {},
+  tsserver = {},
 
   lua_ls = {
     Lua = {
@@ -597,8 +637,6 @@ cmp.setup {
     end,
   },
   mapping = cmp.mapping.preset.insert {
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete {},
     ['<CR>'] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Replace,
