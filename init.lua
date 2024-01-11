@@ -41,7 +41,10 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.g.zipPlugin_ext= '*.zip,*.jar,*.xpi,*.ja,*.war,*.ear,*.celzip,*.oxt,*.kmz,*.wsz,*.xap,*.docx,*.docm,*.dotx,*.dotm,*.potx,*.potm,*.ppsx,*.ppsm,*.pptx,*.pptm,*.ppam,*.sldx,*.thmx,*.xlam,*.xlsx,*.xlsm,*.xlsb,*.xltx,*.xltm,*.xlam,*.crtx,*.vdw,*.glox,*.gcsx,*.gqsx,*.epub,*.fmu'
 
+-- Copilot tab to auto complete. 
+vim.g.copilot_assume_mapped = true
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -73,6 +76,27 @@ require('lazy').setup({
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
+  -- Copilot
+  'github/copilot.vim',
+
+  -- Vim Tmux Navigator
+  {
+    "christoomey/vim-tmux-navigator",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+    keys = {
+      { "<C-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
+      { "<C-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
+      { "<C-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
+      { "<C-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
+      { "<C-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
+    },
+  },
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   { -- LSP Configuration & Plugins
@@ -90,7 +114,7 @@ require('lazy').setup({
       'folke/neodev.nvim',
     },
   },
-
+  { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
@@ -111,14 +135,14 @@ require('lazy').setup({
       },
     },
   },
-
-  { -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
+  { 'f-person/git-blame.nvim', opts = {} },
+  -- { -- Theme inspired by Atom
+  --   'navarasu/onedark.nvim',
+  --   priority = 1000,
+  --   config = function()
+  --     vim.cmd.colorscheme 'onedark'
+  --   end,
+  -- },
 
   { -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
@@ -126,7 +150,7 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'onedark',
+        theme = 'catppuccin',
         component_separators = '|',
         section_separators = '',
       },
@@ -158,7 +182,7 @@ require('lazy').setup({
 
   -- Fuzzy Finder (files, lsp, etc)
   {
-    'nvim-telescope/telescope.nvim', branch = '1.1.x',
+    'nvim-telescope/telescope.nvim',
     dependencies = {
         'nvim-lua/plenary.nvim',
         'nvim-telescope/telescope-live-grep-args.nvim',
@@ -191,9 +215,9 @@ require('lazy').setup({
       pcall(require('nvim-treesitter.install').update { with_sync = true })
     end,
   },
-  {
-    'karb94/neoscroll.nvim',
-  },
+  -- {
+  --   'karb94/neoscroll.nvim',
+  -- },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -220,6 +244,8 @@ vim.o.hlsearch = false
 
 -- Make line numbers default
 vim.wo.number = true
+vim.o.relativenumber = true
+vim.o.cursorline = true
 
 -- Enable mouse mode
 vim.o.mouse = 'a'
@@ -259,9 +285,24 @@ vim.o.termguicolors = true
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
+-- Disable Arrow keys in normal mode.
+vim.keymap.set('n', '<Up>', '<Nop>', { silent = true })
+vim.keymap.set('n', '<Down>', '<Nop>', { silent = true })
+vim.keymap.set('n', '<Left>', '<Nop>', { silent = true })
+vim.keymap.set('n', '<Right>', '<Nop>', { silent = true })
+
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- Keymaps for GH.
+vim.keymap.set('n', '<leader>po', ':GitBlameOpenCommitURL<CR>', { desc = 'Open Blame PR in browser.' })
+vim.keymap.set('n', '<leader>fo', ':GitBlameOpenFileURL<CR>', { desc = 'Open current file in browser.' })
+vim.keymap.set('n', '<leader>cc', ':GitBlameCopySHA<CR>', { desc = 'Copy GH commit SHA.' })
+vim.keymap.set('n', 'tb', ':GitBlameToggle<CR>', { desc = 'Toggle GitBlame.' })
+
+-- Telescope mappings
+vim.keymap.set('n', '<leader>tr', ':Telescope resume<CR>', { desc = '[T]elescope [R]esume' })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -277,13 +318,70 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- [[ Configure Bufferline ]]
 require("bufferline").setup{}
 
--- [[ Configure theme ]]
-require('onedark').setup {
-    style = 'warmer'
-}
-require('onedark').load()
+-- [[ Configure Theme ]]
+require("catppuccin").setup({
+    flavour = "mocha", -- latte, frappe, macchiato, mocha
+    background = { -- :h background
+        light = "latte",
+        dark = "mocha",
+    },
+    transparent_background = false, -- disables setting the background color.
+    show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
+    term_colors = false, -- sets terminal colors (e.g. `g:terminal_color_0`)
+    dim_inactive = {
+        enabled = false, -- dims the background color of inactive window
+        shade = "dark",
+        percentage = 0.15, -- percentage of the shade to apply to the inactive window
+    },
+    no_italic = false, -- Force no italic
+    no_bold = false, -- Force no bold
+    no_underline = false, -- Force no underline
+    styles = { -- Handles the styles of general hi groups (see `:h highlight-args`):
+        comments = { "italic" }, -- Change the style of comments
+        conditionals = { "italic" },
+        loops = {},
+        functions = {},
+        keywords = {},
+        strings = {},
+        variables = {},
+        numbers = {},
+        booleans = {},
+        properties = {},
+        types = {},
+        operators = {},
+    },
+    color_overrides = {},
+    custom_highlights = {},
+    integrations = {
+        cmp = true,
+        gitsigns = true,
+        nvimtree = true,
+        treesitter = true,
+        notify = false,
+        mini = {
+            enabled = true,
+            indentscope_color = "",
+        },
+        -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
+    },
+})
 
+-- setup must be called before loading
+vim.cmd.colorscheme "catppuccin"
+
+-- -- [[ Configure theme ]]
+-- require('onedark').setup {
+--     style = 'deep'
+-- }
+-- require('onedark').load()
+--
 -- [[ Configure Git ]]
+
+require('gitblame').setup {
+     --Note how the `gitblame_` prefix is omitted in `setup`
+    enabled = false,
+}
+
 require('gitsigns').setup {
   signs = {
     add          = { text = '│' },
@@ -356,7 +454,7 @@ require('gitsigns').setup {
     -- map('n', '<leader>hR', gs.reset_buffer)
     -- map('n', '<leader>gp', gs.preview_hunk)
     map('n', '<leader>hb', function() gs.blame_line{full=true} end)
-    map('n', '<leader>tb', gs.toggle_current_line_blame)
+    -- map('n', '<leader>tb', gs.toggle_current_line_blame)
     map('n', '<leader>hd', gs.diffthis)
     -- map('n', '<leader>hD', function() gs.diffthis('~') end)
     -- map('n', '<leader>td', gs.toggle_deleted)
@@ -377,6 +475,16 @@ require('telescope').setup {
         ['<C-d>'] = true,
         ["<C-s>"] = lga_actions.quote_prompt(),
         ["<C-g>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+      },
+    },
+    layout_strategy = "vertical",
+    layout_config = {
+      preview_height = 0.7,
+    },
+    pickers = {
+      find_files = {
+        hidden = true,
+        theme = "dropdown",
       },
     },
   },
@@ -402,19 +510,19 @@ require("nvim-tree").setup({
   },
 })
 
-require('neoscroll').setup({
-    -- All these keys will be mapped to their corresponding default scrolling animation
-    mappings = {'<C-u>', '<C-d>', '<C-b>', '<C-f>',
-                '<C-y>', '<C-e>', 'zt', 'zz', 'zb'},
-    hide_cursor = false,          -- Hide cursor while scrolling
-    stop_eof = true,             -- Stop at <EOF> when scrolling downwards
-    respect_scrolloff = false,   -- Stop scrolling when the cursor reaches the scrolloff margin of the file
-    cursor_scrolls_alone = true, -- The cursor will keep on scrolling even if the window cannot scroll further
-    easing_function = nil,       -- Default easing function
-    pre_hook = nil,              -- Function to run before the scrolling animation starts
-    post_hook = nil,             -- Function to run after the scrolling animation ends
-    performance_mode = true,    -- disable "performance Mode" on all buffers.
-})
+-- require('neoscroll').setup({
+--     -- All these keys will be mapped to their corresponding default scrolling animation
+--     mappings = {'<C-a>', '<C-d>', '', '',
+--                 '', '', 'zt', 'zz', 'zb'},
+--     hide_cursor = false,          -- Hide cursor while scrolling
+--     stop_eof = true,             -- Stop at <EOF> when scrolling downwards
+--     respect_scrolloff = false,   -- Stop scrolling when the cursor reaches the scrolloff margin of the file
+--     cursor_scrolls_alone = true, -- The cursor will keep on scrolling even if the window cannot scroll further
+--     easing_function = nil,       -- Default easing function
+--     pre_hook = nil,              -- Function to run before the scrolling animation starts
+--     post_hook = nil,             -- Function to run after the scrolling animation ends
+--     performance_mode = true,    -- disable "performance Mode" on all buffers.
+-- })
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
@@ -448,7 +556,7 @@ require('treesitter-context').setup{
   max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
   min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
   line_numbers = true,
-  multiline_threshold = 20, -- Maximum number of lines to show for a single context
+  multiline_threshold = 4, -- Maximum number of lines to show for a single context
   trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
   mode = 'cursor',  -- Line used to calculate context. Choices: 'cursor', 'topline'
   -- Separator between context and content. Should be a single character string, like '-'.
@@ -563,7 +671,7 @@ local on_attach = function(_, bufnr)
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  nmap('<C-i>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
