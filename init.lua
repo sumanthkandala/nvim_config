@@ -119,7 +119,12 @@ require('lazy').setup({
     'hrsh7th/nvim-cmp',
     dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
   },
-
+  {
+    "kkharji/sqlite.lua",
+  }, 
+  {
+    "nvim-telescope/telescope-smart-history.nvim",
+  }, 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
   { -- Adds git releated signs to the gutter, as well as utilities for managing changes
@@ -215,9 +220,6 @@ require('lazy').setup({
       pcall(require('nvim-treesitter.install').update { with_sync = true })
     end,
   },
-  -- {
-  --   'karb94/neoscroll.nvim',
-  -- },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -271,7 +273,7 @@ vim.wo.signcolumn = 'yes'
 -- Decrease update time
 vim.o.updatetime = 250
 vim.o.timeout = true
-vim.o.timeoutlen = 300
+vim.o.timeoutlen = 1000
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
@@ -445,27 +447,28 @@ require('gitsigns').setup {
     end, {expr=true})
 
     -- Actions
-    -- map('n', '<leader>hs', gs.stage_hunk)
-    -- map('n', '<leader>hr', gs.reset_hunk)
-    -- map('v', '<leader>hs', function() gs.stage_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
-    -- map('v', '<leader>hr', function() gs.reset_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
-    -- map('n', '<leader>hS', gs.stage_buffer)
-    -- map('n', '<leader>hu', gs.undo_stage_hunk)
-    -- map('n', '<leader>hR', gs.reset_buffer)
-    -- map('n', '<leader>gp', gs.preview_hunk)
+    map('n', '<leader>hs', gs.stage_hunk)
+    map('n', '<leader>hr', gs.reset_hunk)
+    map('v', '<leader>hs', function() gs.stage_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
+    map('v', '<leader>hr', function() gs.reset_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
+    map('n', '<leader>hS', gs.stage_buffer)
+    map('n', '<leader>hu', gs.undo_stage_hunk)
+    map('n', '<leader>hR', gs.reset_buffer)
+    map('n', '<leader>gp', gs.preview_hunk)
     map('n', '<leader>hb', function() gs.blame_line{full=true} end)
     -- map('n', '<leader>tb', gs.toggle_current_line_blame)
     map('n', '<leader>hd', gs.diffthis)
-    -- map('n', '<leader>hD', function() gs.diffthis('~') end)
-    -- map('n', '<leader>td', gs.toggle_deleted)
+    map('n', '<leader>hD', function() gs.diffthis('~') end)
+    map('n', '<leader>td', gs.toggle_deleted)
 
     -- Text object
-    -- map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
   end
 }
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
+local actions = require("telescope.actions")
 local lga_actions = require("telescope-live-grep-args.actions")
 require('telescope').setup {
   defaults = {
@@ -473,9 +476,15 @@ require('telescope').setup {
       i = {
         ['<C-u>'] = true,
         ['<C-d>'] = true,
+        ['<C-Down>'] = actions.cycle_history_next,
+        ['<C-Up>'] = actions.cycle_history_prev,
         ["<C-s>"] = lga_actions.quote_prompt(),
-        ["<C-g>"] = lga_actions.quote_prompt({ postfix = " --iglob " }),
+        ["<C-g>"] = lga_actions.quote_prompt({ postfix =  " --iglob "}),
       },
+    },
+    history = {
+      path = '~/.local/share/nvim/telescope_history.sqlite3',
+      limit = 100,
     },
     layout_strategy = "vertical",
     layout_config = {
@@ -510,22 +519,9 @@ require("nvim-tree").setup({
   },
 })
 
--- require('neoscroll').setup({
---     -- All these keys will be mapped to their corresponding default scrolling animation
---     mappings = {'<C-a>', '<C-d>', '', '',
---                 '', '', 'zt', 'zz', 'zb'},
---     hide_cursor = false,          -- Hide cursor while scrolling
---     stop_eof = true,             -- Stop at <EOF> when scrolling downwards
---     respect_scrolloff = false,   -- Stop scrolling when the cursor reaches the scrolloff margin of the file
---     cursor_scrolls_alone = true, -- The cursor will keep on scrolling even if the window cannot scroll further
---     easing_function = nil,       -- Default easing function
---     pre_hook = nil,              -- Function to run before the scrolling animation starts
---     post_hook = nil,             -- Function to run after the scrolling animation ends
---     performance_mode = true,    -- disable "performance Mode" on all buffers.
--- })
-
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
+pcall(require('telescope').load_extension, 'smart_history')
 
 -- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
@@ -542,8 +538,19 @@ vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { des
 vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
 vim.keymap.set('n', '<leader>sg', require('telescope').extensions.live_grep_args.live_grep_args, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>sk', require('telescope.builtin').keymaps, { desc = '[S]earch [K]eymaps' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>tt', ':NvimTreeToggle<CR>', { desc = '[T]oggle [T]ree' })
+vim.api.nvim_create_user_command("DiagnosticToggle", function()
+	local config = vim.diagnostic.config
+	local vt = config().virtual_text
+	config {
+		virtual_text = not vt,
+		underline = not vt,
+		signs = not vt,
+	}
+end, { desc = "toggle diagnostic" })
+vim.keymap.set('n', '<leader>dt', ':DiagnosticToggle<CR>', { desc = '[T]oggle [D]iagnostics' })
 
 -- Bufferline actions.
 vim.keymap.set('n', '<C-n>', ':bnext<CR>', { desc = 'Next Buffer' })
@@ -687,25 +694,7 @@ local on_attach = function(_, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 end
 
--- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yourself.
-local servers = {
-  clangd = {},
-  pyright = {},
-  tsserver = {},
 
-  lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
-  },
-}
-
--- Setup neovim lua configuration
 require('neodev').setup()
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
@@ -717,6 +706,46 @@ require('mason').setup()
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
+
+-- Enable the following language servers
+--  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
+--
+--  Add any additional override configuration in the following tables. They will be passed to
+--  the `settings` field of the server config. You must look up that documentation yoursel.
+local servers = {
+  clangd = {
+    -- root_dir = function()
+    --  return require("lspconfig.util").root_pattern("compile_commands.json", "compile_flags.txt")
+    -- end,
+    root_dir = {"/applied2", "/home/sumanth/applied2"},
+    capabilities = {
+      offsetEncoding = { "utf-16" },
+    },
+    cmd = {
+      "clangd",
+      "--background-index",
+      "--clang-tidy",
+      "--header-insertion=iwyu",
+      "--completion-style=detailed",
+      "--function-arg-placeholders",
+      "--fallback-style=llvm",
+    },
+    init_options = {
+      usePlaceholders = true,
+      completeUnimported = true,
+      clangdFileStatus = true,
+    },
+  },
+  pyright = {},
+  tsserver = {},
+
+  lua_ls = {
+    Lua = {
+      workspace = { checkThirdParty = false },
+      telemetry = { enable = false },
+    },
+  },
+}
 
 mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
@@ -731,6 +760,19 @@ mason_lspconfig.setup_handlers {
     }
   end,
 }
+
+-- require('lspconfig').clangd.setup {
+--     -- on_attach = keybinds.on_attach,
+--     cmd = {
+--         "clangd",
+--         "--background-index",
+--         "--suggest-missing-includes",
+--         "--compile-commands-dir=/home/sumanth/applied2",
+--         "--query-driver=/usr/bin/gcc,/usr/bin/g++",
+--     },
+--     -- filetypes = { "cc", "c", "cpp", "objc", "objcpp", "h", "hpp" },
+-- }
+
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
