@@ -79,24 +79,6 @@ require('lazy').setup({
   -- Copilot
   'github/copilot.vim',
 
-  -- Vim Tmux Navigator
-  {
-    "christoomey/vim-tmux-navigator",
-    cmd = {
-      "TmuxNavigateLeft",
-      "TmuxNavigateDown",
-      "TmuxNavigateUp",
-      "TmuxNavigateRight",
-      "TmuxNavigatePrevious",
-    },
-    keys = {
-      { "<C-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
-      { "<C-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
-      { "<C-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
-      { "<C-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
-      { "<C-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
-    },
-  },
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   { -- LSP Configuration & Plugins
@@ -140,15 +122,7 @@ require('lazy').setup({
       },
     },
   },
-  { 'f-person/git-blame.nvim', opts = {} },
-  -- { -- Theme inspired by Atom
-  --   'navarasu/onedark.nvim',
-  --   priority = 1000,
-  --   config = function()
-  --     vim.cmd.colorscheme 'onedark'
-  --   end,
-  -- },
-
+  {'WhoIsSethDaniel/lualine-lsp-progress.nvim'},
   { -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
@@ -164,22 +138,15 @@ require('lazy').setup({
           {
             'filename',
             file_status = true, -- displays file status (readonly status, modified status)
-            path = 1 -- 0 = just filename, 1 = relative path, 2 = absolute path
-          }
+            path = 1, -- 0 = just filename, 1 = relative path, 2 = absolute path
+          },
+          {
+            'lsp_progress',
+          },
         }
       }
     },
   },
-
-  -- { -- Add indentation guides even on blank lines
-  --   'lukas-reineke/indent-blankline.nvim',
-  --   -- Enable `lukas-reineke/indent-blankline.nvim`
-  --   -- See `:help indent_blankline.txt`
-  --   opts = {
-  --     char = '┊',
-  --     show_trailing_blankline_indent = false,
-  --   },
-  -- },
 
   { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
   -- "gc" to comment visual regions/lines
@@ -297,12 +264,6 @@ vim.keymap.set('n', '<Right>', '<Nop>', { silent = true })
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
--- Keymaps for GH.
-vim.keymap.set('n', '<leader>po', ':GitBlameOpenCommitURL<CR>', { desc = 'Open Blame PR in browser.' })
-vim.keymap.set('n', '<leader>fo', ':GitBlameOpenFileURL<CR>', { desc = 'Open current file in browser.' })
-vim.keymap.set('n', '<leader>cc', ':GitBlameCopySHA<CR>', { desc = 'Copy GH commit SHA.' })
-vim.keymap.set('n', 'tb', ':GitBlameToggle<CR>', { desc = 'Toggle GitBlame.' })
-
 -- Telescope mappings
 vim.keymap.set('n', '<leader>tr', ':Telescope resume<CR>', { desc = '[T]elescope [R]esume' })
 
@@ -371,19 +332,7 @@ require("catppuccin").setup({
 -- setup must be called before loading
 vim.cmd.colorscheme "catppuccin"
 
--- -- [[ Configure theme ]]
--- require('onedark').setup {
---     style = 'deep'
--- }
--- require('onedark').load()
---
 -- [[ Configure Git ]]
-
-require('gitblame').setup {
-     --Note how the `gitblame_` prefix is omitted in `setup`
-    enabled = false,
-}
-
 require('gitsigns').setup {
   signs = {
     add          = { text = '│' },
@@ -456,7 +405,7 @@ require('gitsigns').setup {
     map('n', '<leader>hR', gs.reset_buffer)
     map('n', '<leader>gp', gs.preview_hunk)
     map('n', '<leader>hb', function() gs.blame_line{full=true} end)
-    -- map('n', '<leader>tb', gs.toggle_current_line_blame)
+    map('n', '<leader>tb', gs.toggle_current_line_blame)
     map('n', '<leader>hd', gs.diffthis)
     map('n', '<leader>hD', function() gs.diffthis('~') end)
     map('n', '<leader>td', gs.toggle_deleted)
@@ -499,9 +448,9 @@ require('telescope').setup {
   },
 }
 
--- Disable netrw to enable nvim-tree.
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+-- -- Disable netrw to enable nvim-tree.
+-- vim.g.loaded_netrw = 1
+-- vim.g.loaded_netrwPlugin = 1
 
 -- Highlight groups.
 vim.opt.termguicolors = true
@@ -597,50 +546,6 @@ require('nvim-treesitter.configs').setup {
       node_decremental = '<M-space>',
     },
   },
-  --textobjects = {
-  --  select = {
-  --    enable = true,
-  --    lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-  --    keymaps = {
-  --      -- You can use the capture groups defined in textobjects.scm
-  --      ['aa'] = '@parameter.outer',
-  --      ['ia'] = '@parameter.inner',
-  --      ['af'] = '@function.outer',
-  --      ['if'] = '@function.inner',
-  --      ['ac'] = '@class.outer',
-  --      ['ic'] = '@class.inner',
-  --    },
-  --  },
-  --  move = {
-  --    enable = true,
-  --    set_jumps = true, -- whether to set jumps in the jumplist
-  --    goto_next_start = {
-  --      [']m'] = '@function.outer',
-  --      [']]'] = '@class.outer',
-  --    },
-  --    goto_next_end = {
-  --      [']M'] = '@function.outer',
-  --      [']['] = '@class.outer',
-  --    },
-  --    goto_previous_start = {
-  --      ['[m'] = '@function.outer',
-  --      ['[['] = '@class.outer',
-  --    },
-  --    goto_previous_end = {
-  --      ['[M'] = '@function.outer',
-  --      ['[]'] = '@class.outer',
-  --    },
-  --  },
-  --  swap = {
-  --    enable = true,
-  --    swap_next = {
-  --      ['<leader>a'] = '@parameter.inner',
-  --    },
-  --    swap_previous = {
-  --      ['<leader>A'] = '@parameter.inner',
-  --    },
-  --  },
-  --},
 }
 
 -- Diagnostic keymaps
@@ -714,30 +619,12 @@ local mason_lspconfig = require 'mason-lspconfig'
 --  the `settings` field of the server config. You must look up that documentation yoursel.
 local servers = {
   clangd = {
-    -- root_dir = function()
-    --  return require("lspconfig.util").root_pattern("compile_commands.json", "compile_flags.txt")
-    -- end,
-    root_dir = {"/applied2", "/home/sumanth/applied2"},
     capabilities = {
       offsetEncoding = { "utf-16" },
     },
-    cmd = {
-      "clangd",
-      "--background-index",
-      "--clang-tidy",
-      "--header-insertion=iwyu",
-      "--completion-style=detailed",
-      "--function-arg-placeholders",
-      "--fallback-style=llvm",
-    },
-    init_options = {
-      usePlaceholders = true,
-      completeUnimported = true,
-      clangdFileStatus = true,
-    },
   },
-  pyright = {},
-  tsserver = {},
+  -- pyright = {},
+  -- tsserver = {},
 
   lua_ls = {
     Lua = {
@@ -760,19 +647,6 @@ mason_lspconfig.setup_handlers {
     }
   end,
 }
-
--- require('lspconfig').clangd.setup {
---     -- on_attach = keybinds.on_attach,
---     cmd = {
---         "clangd",
---         "--background-index",
---         "--suggest-missing-includes",
---         "--compile-commands-dir=/home/sumanth/applied2",
---         "--query-driver=/usr/bin/gcc,/usr/bin/g++",
---     },
---     -- filetypes = { "cc", "c", "cpp", "objc", "objcpp", "h", "hpp" },
--- }
-
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
