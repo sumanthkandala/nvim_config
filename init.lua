@@ -79,6 +79,24 @@ require('lazy').setup({
   -- Copilot
   'github/copilot.vim',
 
+  -- Vim Tmux Navigator
+  {
+    "christoomey/vim-tmux-navigator",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+    keys = {
+      { "<C-h>", "<cmd><C-U>TmuxNavigateLeft<cr>" },
+      { "<C-j>", "<cmd><C-U>TmuxNavigateDown<cr>" },
+      { "<C-k>", "<cmd><C-U>TmuxNavigateUp<cr>" },
+      { "<C-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
+      { "<C-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
+    },
+  },
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   { -- LSP Configuration & Plugins
@@ -448,9 +466,9 @@ require('telescope').setup {
   },
 }
 
--- -- Disable netrw to enable nvim-tree.
--- vim.g.loaded_netrw = 1
--- vim.g.loaded_netrwPlugin = 1
+-- Disable netrw to enable nvim-tree.
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 -- Highlight groups.
 vim.opt.termguicolors = true
@@ -546,6 +564,50 @@ require('nvim-treesitter.configs').setup {
       node_decremental = '<M-space>',
     },
   },
+  --textobjects = {
+  --  select = {
+  --    enable = true,
+  --    lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+  --    keymaps = {
+  --      -- You can use the capture groups defined in textobjects.scm
+  --      ['aa'] = '@parameter.outer',
+  --      ['ia'] = '@parameter.inner',
+  --      ['af'] = '@function.outer',
+  --      ['if'] = '@function.inner',
+  --      ['ac'] = '@class.outer',
+  --      ['ic'] = '@class.inner',
+  --    },
+  --  },
+  --  move = {
+  --    enable = true,
+  --    set_jumps = true, -- whether to set jumps in the jumplist
+  --    goto_next_start = {
+  --      [']m'] = '@function.outer',
+  --      [']]'] = '@class.outer',
+  --    },
+  --    goto_next_end = {
+  --      [']M'] = '@function.outer',
+  --      [']['] = '@class.outer',
+  --    },
+  --    goto_previous_start = {
+  --      ['[m'] = '@function.outer',
+  --      ['[['] = '@class.outer',
+  --    },
+  --    goto_previous_end = {
+  --      ['[M'] = '@function.outer',
+  --      ['[]'] = '@class.outer',
+  --    },
+  --  },
+  --  swap = {
+  --    enable = true,
+  --    swap_next = {
+  --      ['<leader>a'] = '@parameter.inner',
+  --    },
+  --    swap_previous = {
+  --      ['<leader>A'] = '@parameter.inner',
+  --    },
+  --  },
+  --},
 }
 
 -- Diagnostic keymaps
