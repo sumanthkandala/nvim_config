@@ -125,17 +125,6 @@ bindkey '^F' forward-char
 
 alias ls="ls --color=auto"
 
-# Matlab Docker
-alias ddm="cd ~/applied2; dev/containers/dev/remove.sh; dev/containers/dev/start.sh -with_matlab -mac_address 96:2c:71:72:c2:0b; dev/containers/dev/into.sh -shell /bin/zsh"
-alias iddm="cd ~/applied2; dev/containers/dev/into.sh -shell /bin/zsh"
-
-# Worktree Docker
-alias dd="cd ~/master_applied2; dev/containers/dev/remove.sh -name applied_worktree; dev/containers/dev/start.sh -no_mount_ports -name applied_worktree; dev/containers/dev/into.sh -name applied_worktree -shell /bin/zsh"
-alias idd="cd ~/master_applied2; dev/containers/dev/into.sh -name applied_worktree -shell /bin/zsh"
-
-# Database
-alias drop_db="bazel run //adp/lib/db_admin -- --schema drop --db_name "
-
 # Tmux
 alias tattach="tmux attach -t"
 alias tlist="tmux list-sessions"
