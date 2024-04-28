@@ -466,10 +466,6 @@ require('telescope').setup {
   },
 }
 
--- Disable netrw to enable nvim-tree.
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-
 -- Highlight groups.
 vim.opt.termguicolors = true
 
