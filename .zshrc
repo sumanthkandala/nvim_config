@@ -118,30 +118,17 @@ bindkey '^F' forward-char
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
 alias ls="ls --color=auto"
 
 # Tmux
 alias tattach="tmux attach -t"
 alias tlist="tmux list-sessions"
-
-function torclogin() {
-  CREDS=$(aws sts assume-role --role-arn arn:aws:iam::418424059617:role/applied_external_admin --role-session-name cluster-access)
-  ACCESS_KEY=$(echo $CREDS | jq ".Credentials.AccessKeyId" | tr -d '"')
-  SECRET_KEY=$(echo $CREDS | jq ".Credentials.SecretAccessKey" | tr -d '"')
-  SESSION_TOKEN=$(echo $CREDS| jq ".Credentials.SessionToken" | tr -d '"')
-  aws configure set aws_access_key_id $ACCESS_KEY --profile default
-  aws configure set aws_secret_access_key $SECRET_KEY --profile default
-  aws configure set aws_session_token $SESSION_TOKEN --profile default
-  export AWS_PROFILE=default
-}
+alias tkill="tmux kill-server"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+[[ ! -f ~/.zshrc.local ]] || source ~/.zshrc.local

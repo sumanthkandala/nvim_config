@@ -504,6 +504,7 @@ vim.keymap.set('n', '<leader>sg', require('telescope').extensions.live_grep_args
 vim.keymap.set('n', '<leader>sk', require('telescope.builtin').keymaps, { desc = '[S]earch [K]eymaps' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>tt', ':NvimTreeToggle<CR>', { desc = '[T]oggle [T]ree' })
+vim.keymap.set('n', '<leader>fo', ':GBrowse<CR>', { desc = '[F]ile [O]pen' })
 vim.api.nvim_create_user_command("DiagnosticToggle", function()
 	local config = vim.diagnostic.config
 	local vt = config().virtual_text
