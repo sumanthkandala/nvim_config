@@ -140,7 +140,7 @@ require('lazy').setup({
       },
     },
   },
-  {'WhoIsSethDaniel/lualine-lsp-progress.nvim'},
+  { 'arkav/lualine-lsp-progress' },
   { -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
@@ -458,8 +458,14 @@ require('telescope').setup {
       preview_height = 0.7,
     },
     pickers = {
+      live_grep = {
+        hidden = true,
+        -- file_ignore_patterns = {".venv", "node_modules" },
+        theme = "dropdown",
+      },
       find_files = {
         hidden = true,
+        -- file_ignore_patterns = {".venv", "node_modules" },
         theme = "dropdown",
       },
     },
@@ -505,16 +511,12 @@ vim.keymap.set('n', '<leader>sk', require('telescope.builtin').keymaps, { desc =
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>tt', ':NvimTreeToggle<CR>', { desc = '[T]oggle [T]ree' })
 vim.keymap.set('n', '<leader>fo', ':GBrowse<CR>', { desc = '[F]ile [O]pen' })
-vim.api.nvim_create_user_command("DiagnosticToggle", function()
-	local config = vim.diagnostic.config
-	local vt = config().virtual_text
-	config {
-		virtual_text = not vt,
-		underline = not vt,
-		signs = not vt,
-	}
-end, { desc = "toggle diagnostic" })
-vim.keymap.set('n', '<leader>dt', ':DiagnosticToggle<CR>', { desc = '[T]oggle [D]iagnostics' })
+
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+    vim.lsp.diagnostic.on_publish_diagnostics, {
+        virtual_text = false
+    }
+)
 
 -- Bufferline actions.
 vim.keymap.set('n', '<C-n>', ':bnext<CR>', { desc = 'Next Buffer' })
@@ -675,15 +677,23 @@ local mason_lspconfig = require 'mason-lspconfig'
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
 --
 --  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yoursel.
+--  the `settings` field of the server config. You must look up that documentation yourself.
+
+local workspace_folder = vim.fn.getcwd()
 local servers = {
   clangd = {
     capabilities = {
       offsetEncoding = { "utf-16" },
     },
+    cmd = {
+      "clangd",
+      "--header-insertion=never",
+      "--compile-commands-dir=" .. workspace_folder,
+      "--query-driver=**",
+    },
   },
-  -- pyright = {},
-  -- tsserver = {},
+  pyright = {},
+  tsserver = {},
 
   lua_ls = {
     Lua = {
@@ -699,11 +709,20 @@ mason_lspconfig.setup {
 
 mason_lspconfig.setup_handlers {
   function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-    }
+    if server_name == 'clangd' then
+      require('lspconfig')[server_name].setup {
+        capabilities = capabilities,
+        on_attach = on_attach,
+        cmd = servers[server_name].cmd,
+        settings = servers[server_name],
+      }
+    else
+      require('lspconfig')[server_name].setup {
+        capabilities = capabilities,
+        on_attach = on_attach,
+        settings = servers[server_name],
+      }
+    end
   end,
 }
 
