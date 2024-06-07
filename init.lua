@@ -542,16 +542,12 @@ require('treesitter-context').setup{
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
   ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vim', 'query' },
-
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
-
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
-
   -- List of parsers to ignore installing (or "all")
   ignore_install = {},
-
   highlight = { enable = true },
   indent = { enable = true, disable = { 'python' } },
   incremental_selection = {
@@ -682,14 +678,12 @@ local mason_lspconfig = require 'mason-lspconfig'
 local workspace_folder = vim.fn.getcwd()
 local servers = {
   clangd = {
-    capabilities = {
-      offsetEncoding = { "utf-16" },
-    },
     cmd = {
       "clangd",
       "--header-insertion=never",
       "--compile-commands-dir=" .. workspace_folder,
       "--query-driver=**",
+      "--offset-encoding=utf-16",
     },
   },
   pyright = {},
