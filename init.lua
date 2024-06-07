@@ -108,7 +108,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      -- { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim', opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -310,9 +310,9 @@ require("catppuccin").setup({
     show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
     term_colors = false, -- sets terminal colors (e.g. `g:terminal_color_0`)
     dim_inactive = {
-        enabled = false, -- dims the background color of inactive window
+        enabled = true, -- dims the background color of inactive window
         shade = "dark",
-        percentage = 0.15, -- percentage of the shade to apply to the inactive window
+        percentage = 0.35, -- percentage of the shade to apply to the inactive window
     },
     no_italic = false, -- Force no italic
     no_bold = false, -- Force no bold
@@ -338,7 +338,7 @@ require("catppuccin").setup({
         gitsigns = true,
         nvimtree = true,
         treesitter = true,
-        notify = false,
+        notify = true,
         mini = {
             enabled = true,
             indentscope_color = "",
@@ -454,20 +454,17 @@ require('telescope').setup {
       limit = 100,
     },
     layout_strategy = "vertical",
-    layout_config = {
-      preview_height = 0.7,
+  },
+  pickers = {
+    lsp_references = {
+      show_line = false,
     },
-    pickers = {
-      live_grep = {
-        hidden = true,
-        -- file_ignore_patterns = {".venv", "node_modules" },
-        theme = "dropdown",
-      },
-      find_files = {
-        hidden = true,
-        -- file_ignore_patterns = {".venv", "node_modules" },
-        theme = "dropdown",
-      },
+    live_grep = {
+      theme = "dropdown",
+    },
+    find_files = {
+      theme = "dropdown",
+      previewer = false,
     },
   },
 }
@@ -485,7 +482,10 @@ require("nvim-tree").setup({
       },
     update_focused_file = {
       enable = true,
-  },
+      },
+    view = {
+      width = 50,
+    },
 })
 
 -- Enable telescope fzf native, if installed
@@ -563,50 +563,50 @@ require('nvim-treesitter.configs').setup {
       node_decremental = '<M-space>',
     },
   },
-  --textobjects = {
-  --  select = {
-  --    enable = true,
-  --    lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-  --    keymaps = {
-  --      -- You can use the capture groups defined in textobjects.scm
-  --      ['aa'] = '@parameter.outer',
-  --      ['ia'] = '@parameter.inner',
-  --      ['af'] = '@function.outer',
-  --      ['if'] = '@function.inner',
-  --      ['ac'] = '@class.outer',
-  --      ['ic'] = '@class.inner',
-  --    },
-  --  },
-  --  move = {
-  --    enable = true,
-  --    set_jumps = true, -- whether to set jumps in the jumplist
-  --    goto_next_start = {
-  --      [']m'] = '@function.outer',
-  --      [']]'] = '@class.outer',
-  --    },
-  --    goto_next_end = {
-  --      [']M'] = '@function.outer',
-  --      [']['] = '@class.outer',
-  --    },
-  --    goto_previous_start = {
-  --      ['[m'] = '@function.outer',
-  --      ['[['] = '@class.outer',
-  --    },
-  --    goto_previous_end = {
-  --      ['[M'] = '@function.outer',
-  --      ['[]'] = '@class.outer',
-  --    },
-  --  },
-  --  swap = {
-  --    enable = true,
-  --    swap_next = {
-  --      ['<leader>a'] = '@parameter.inner',
-  --    },
-  --    swap_previous = {
-  --      ['<leader>A'] = '@parameter.inner',
-  --    },
-  --  },
-  --},
+  textobjects = {
+   select = {
+     enable = true,
+     lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+     keymaps = {
+       -- You can use the capture groups defined in textobjects.scm
+       ['aa'] = '@parameter.outer',
+       ['ia'] = '@parameter.inner',
+       ['af'] = '@function.outer',
+       ['if'] = '@function.inner',
+       ['ac'] = '@class.outer',
+       ['ic'] = '@class.inner',
+     },
+   },
+   move = {
+     enable = true,
+     set_jumps = true, -- whether to set jumps in the jumplist
+     goto_next_start = {
+       [']m'] = '@function.outer',
+       [']]'] = '@class.outer',
+     },
+     goto_next_end = {
+       [']M'] = '@function.outer',
+       [']['] = '@class.outer',
+     },
+     goto_previous_start = {
+       ['[m'] = '@function.outer',
+       ['[['] = '@class.outer',
+     },
+     goto_previous_end = {
+       ['[M'] = '@function.outer',
+       ['[]'] = '@class.outer',
+     },
+   },
+   swap = {
+     enable = true,
+     swap_next = {
+       ['<leader>a'] = '@parameter.inner',
+     },
+     swap_previous = {
+       ['<leader>A'] = '@parameter.inner',
+     },
+   },
+  },
 }
 
 -- Diagnostic keymaps
