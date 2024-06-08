@@ -459,11 +459,7 @@ require('telescope').setup {
     lsp_references = {
       show_line = false,
     },
-    live_grep = {
-      theme = "dropdown",
-    },
     find_files = {
-      theme = "dropdown",
       previewer = false,
     },
   },
