@@ -447,6 +447,7 @@ require('telescope').setup {
         ['<C-Up>'] = actions.cycle_history_prev,
         ["<C-s>"] = lga_actions.quote_prompt(),
         ["<C-g>"] = lga_actions.quote_prompt({ postfix =  " --iglob "}),
+        ["<C-z>"] = actions.delete_buffer,
       },
     },
     history = {
@@ -459,7 +460,11 @@ require('telescope').setup {
     lsp_references = {
       show_line = false,
     },
+    live_grep = {
+      hidden = true,
+    },
     find_files = {
+      hidden = true,
       previewer = false,
     },
   },
